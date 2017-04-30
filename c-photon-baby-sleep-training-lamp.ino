@@ -31,8 +31,15 @@ int port;
 String path;
 
 // Declaring RGB led variables
-Led led(D0, D1, D2);
+// Connect Red to D3
+// Connect Green to D1
+// Connect Blue to D0
+// Create a common anode led using false
+Led led(D3, D1, D0, false);
 Color red(255, 0, 0);
+Color green(0, 255, 0);
+Color blue(0, 0, 255);
+Color black(0, 0, 0);
 
 
 // sendHttpRequest function
@@ -75,16 +82,96 @@ void sendHttpRequest(String method, String hostname, int port, String path, Stri
     }
 }
 
+bool setColor(String command)
+{
+    int firstCommaIndex = command.indexOf(',');
+    int secondCommaIndex = command.indexOf(',', firstCommaIndex+1);
+    String intensityRed = command.substring(0, firstCommaIndex);
+    String intensityGreen = command.substring(firstCommaIndex+1, secondCommaIndex);
+    String intensityBlue = command.substring(secondCommaIndex+1);
+    Serial.print("intensityRed: " + intensityRed);  
+    Serial.println();
+    Serial.print("intensityGreen: " + intensityGreen);  
+    Serial.println();
+    Serial.print("intensityBlue: " + intensityBlue);  
+    Serial.println();
+    led.setColor(Color(intensityRed.toInt(), intensityGreen.toInt(), intensityBlue.toInt()));
+    return True;
+}
+
+
+
+bool fadeColor(String command)
+{
+
+    //led.fade(red, blue, 3000);    
+    //delay(5000);
+    int firstCommaIndex = command.indexOf(',');
+    int secondCommaIndex = command.indexOf(',', firstCommaIndex+1);
+    int thirdCommaIndex = command.indexOf(',');
+    int fourthCommaIndex = command.indexOf(',', secondCommaIndex+1);
+
+    String intensityRedFirst = command.substring(0, firstCommaIndex);
+    String intensityGreenFirst = command.substring(firstCommaIndex+1, secondCommaIndex);
+    String intensityBlueFirst = command.substring(secondCommaIndex+1);
+    Serial.print("intensityRed: " + intensityRed);  
+    Serial.println();
+    Serial.print("intensityGreen: " + intensityGreen);  
+    Serial.println();
+    Serial.print("intensityBlue: " + intensityBlue);  
+    Serial.println();
+    return True;
+    // Put into commaIndex variable comma character index number, in order to use it later to split the string
+    int commaIndex = command.indexOf(',');
+// Use the comma separator index to take the 1st part of the command (containing Photon pin port number connected to Relay)
+    String pinNumber = command.substring(0, commaIndex);
+// Use the comma separator index to take the 2nd part of the command (containing the command being sent e.g. on, off, on_off etc)
+    String relayCommand = command.substring(commaIndex+1);
+// Convert the pinNumber from string to integer in order to successfully issue the digitalWrite command later on
+    int pinNumberI = pinNumber.toInt();
+// Print both values to serial for debugging purpose
+//    Serial.print("Pin Number: " + pinNumber);  
+//    Serial.println();
+    Serial.print("Relay Command: " + relayCommand);  
+    Serial.println();
+}
+    
+
+
 void setup() {
     Serial.begin(9600);
+    // Publish functions on the Particle Cloud
+    Particle.function("fadeColor", fadeColor);
+    Particle.function("setColor", setColor);
 }
 
 void loop() {
     // Pulse red from 0% brightness to 100% brightness every 5 seconds
-    led.fade(red.withBrightness(10), red, 5000);
-    
+    //led.fade(red.withBrightness(10), red, 5000);
+    //led.fade(red, blue, 5000);
+    //led.fade(red, blue, 3000);    
+    //delay(5000);
+    //delay(5000);
+    //led.setColor(red);
+    //delay(1000);
+    //led.off();
+    //delay(1000);
+    //led.setColor(green);
+    //delay(1000);
+    //led.off();
+    //delay(1000);
+    //led.setColor(blue);
+    //delay(1000);
+    //led.off();
+    //delay(1000);
+
+    //led.fadeOnce(red, black, 30000);
+    setColor("255,0,0");
+    delay(5000);
+    setColor("0,0,0");
+    delay(5000);
+
     //sendHttpRequest("post", "davidenastri.it", 8080, "/", "Ciao");
     //sendHttpRequest("get", "davidenastri.it", 8080, "/", "Ciao");
 
 }
-
