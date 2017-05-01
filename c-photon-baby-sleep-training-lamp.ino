@@ -1,5 +1,5 @@
 /**
-* SendHttpRequest Function and Example
+* Baby Sleep Training Lamp
 */
 
 #include <rgb-controls.h> // Include rgb led control library
@@ -25,7 +25,7 @@ http_response_t response;
 
 // Declaring sendHttpRequest variables
 unsigned int nextTime = 0; // Next time to contact the server
-String method; // Currently only "get" and "post" are implemented
+String method; // "get" and "post" are currently implemented
 String hostname;
 int port;
 String path;
@@ -42,7 +42,6 @@ Color blue(0, 0, 255);
 Color black(0, 0, 0);
 
 
-// sendHttpRequest function
 void sendHttpRequest(String method, String hostname, int port, String path, String body)
 {
     
@@ -84,93 +83,97 @@ void sendHttpRequest(String method, String hostname, int port, String path, Stri
 
 bool setColor(String command)
 {
+    // Getting index of all the commas in the command
     int firstCommaIndex = command.indexOf(',');
     int secondCommaIndex = command.indexOf(',', firstCommaIndex+1);
+
+    // Using that indexes to split the command subunits
     String intensityRed = command.substring(0, firstCommaIndex);
     String intensityGreen = command.substring(firstCommaIndex+1, secondCommaIndex);
     String intensityBlue = command.substring(secondCommaIndex+1);
+
+    // Printing to serial the color
     Serial.print("intensityRed: " + intensityRed);  
     Serial.println();
     Serial.print("intensityGreen: " + intensityGreen);  
     Serial.println();
     Serial.print("intensityBlue: " + intensityBlue);  
     Serial.println();
-    led.setColor(Color(intensityRed.toInt(), intensityGreen.toInt(), intensityBlue.toInt()));
-    return True;
+    
+    // Color variable
+    Color color(intensityRed.toInt(), intensityGreen.toInt(), intensityBlue.toInt());
+    
+    // Setting the LED to the specified color
+    led.setColor(Color(color));
+    
+    return true;
 }
 
 
 
 bool fadeColor(String command)
 {
-
-    //led.fade(red, blue, 3000);    
-    //delay(5000);
+    // Getting index of all the commas in the command
     int firstCommaIndex = command.indexOf(',');
     int secondCommaIndex = command.indexOf(',', firstCommaIndex+1);
-    int thirdCommaIndex = command.indexOf(',');
-    int fourthCommaIndex = command.indexOf(',', secondCommaIndex+1);
-
-    String intensityRedFirst = command.substring(0, firstCommaIndex);
-    String intensityGreenFirst = command.substring(firstCommaIndex+1, secondCommaIndex);
-    String intensityBlueFirst = command.substring(secondCommaIndex+1);
-    Serial.print("intensityRed: " + intensityRed);  
-    Serial.println();
-    Serial.print("intensityGreen: " + intensityGreen);  
-    Serial.println();
-    Serial.print("intensityBlue: " + intensityBlue);  
-    Serial.println();
-    return True;
-    // Put into commaIndex variable comma character index number, in order to use it later to split the string
-    int commaIndex = command.indexOf(',');
-// Use the comma separator index to take the 1st part of the command (containing Photon pin port number connected to Relay)
-    String pinNumber = command.substring(0, commaIndex);
-// Use the comma separator index to take the 2nd part of the command (containing the command being sent e.g. on, off, on_off etc)
-    String relayCommand = command.substring(commaIndex+1);
-// Convert the pinNumber from string to integer in order to successfully issue the digitalWrite command later on
-    int pinNumberI = pinNumber.toInt();
-// Print both values to serial for debugging purpose
-//    Serial.print("Pin Number: " + pinNumber);  
-//    Serial.println();
-    Serial.print("Relay Command: " + relayCommand);  
-    Serial.println();
-}
+    int thirdCommaIndex = command.indexOf(',', secondCommaIndex+1);
+    int fourthCommaIndex = command.indexOf(',', thirdCommaIndex+1);
+    int fifthCommaIndex = command.indexOf(',', fourthCommaIndex+1);
     
+    // Using that indexes to split the command subunits
+    String intensityRedStart = command.substring(0, firstCommaIndex);
+    String intensityGreenStart = command.substring(firstCommaIndex+1, secondCommaIndex);
+    String intensityBlueStart = command.substring(secondCommaIndex+1, thirdCommaIndex);
+    String intensityRedEnd = command.substring(thirdCommaIndex+1, fourthCommaIndex);
+    String intensityGreenEnd = command.substring(fourthCommaIndex+1, fifthCommaIndex);
+    String intensityBlueEnd = command.substring(fifthCommaIndex+1);
+
+    // Printing to serial the start color
+    Serial.print("intensityRedStart: " + intensityRedStart);  
+    Serial.println();
+    Serial.print("intensityGreenStart: " + intensityGreenStart);  
+    Serial.println();
+    Serial.print("intensityBlueStart: " + intensityBlueStart);  
+    Serial.println();
+    
+    // Printing to serial the end color    
+    Serial.print("intensityRedEnd: " + intensityRedEnd);  
+    Serial.println();
+    Serial.print("intensityGreenEnd: " + intensityGreenEnd);  
+    Serial.println();
+    Serial.print("intensityBlueEnd: " + intensityBlueEnd);  
+    Serial.println();
+    
+    // Start color variable
+    Color start(intensityRedStart.toInt(), intensityGreenStart.toInt(), intensityBlueStart.toInt());
+    
+    // End color variable
+    Color end(intensityRedEnd.toInt(), intensityGreenEnd.toInt(), intensityBlueEnd.toInt());
+    
+    // Fade one from Start color to End color
+    led.fadeOnce(start, end, 30000);
+    
+    return true;
+}
 
 
 void setup() {
+    // Starting serial port
     Serial.begin(9600);
     // Publish functions on the Particle Cloud
     Particle.function("fadeColor", fadeColor);
     Particle.function("setColor", setColor);
+    // When the lamp is turned on the LED is off
+    led.off();
 }
 
+
 void loop() {
+    
     // Pulse red from 0% brightness to 100% brightness every 5 seconds
     //led.fade(red.withBrightness(10), red, 5000);
-    //led.fade(red, blue, 5000);
-    //led.fade(red, blue, 3000);    
-    //delay(5000);
-    //delay(5000);
-    //led.setColor(red);
-    //delay(1000);
-    //led.off();
-    //delay(1000);
-    //led.setColor(green);
-    //delay(1000);
-    //led.off();
-    //delay(1000);
-    //led.setColor(blue);
-    //delay(1000);
-    //led.off();
-    //delay(1000);
-
-    //led.fadeOnce(red, black, 30000);
-    setColor("255,0,0");
-    delay(5000);
-    setColor("0,0,0");
-    delay(5000);
-
+    
+    // Example http calls
     //sendHttpRequest("post", "davidenastri.it", 8080, "/", "Ciao");
     //sendHttpRequest("get", "davidenastri.it", 8080, "/", "Ciao");
 
