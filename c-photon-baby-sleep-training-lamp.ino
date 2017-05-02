@@ -1,5 +1,5 @@
 /**
-* Baby Sleep Training Lamp
+* SendHttpRequest Function and Example
 */
 
 #include <rgb-controls.h> // Include rgb led control library
@@ -25,7 +25,7 @@ http_response_t response;
 
 // Declaring sendHttpRequest variables
 unsigned int nextTime = 0; // Next time to contact the server
-String method; // "get" and "post" are currently implemented
+String method; // Currently only "get" and "post" are implemented
 String hostname;
 int port;
 String path;
@@ -42,9 +42,9 @@ Color blue(0, 0, 255);
 Color black(0, 0, 0);
 
 
+// sendHttpRequest function
 void sendHttpRequest(String method, String hostname, int port, String path, String body)
 {
-    
     request.hostname = hostname;
     request.port = port;
     request.path = path;
@@ -109,8 +109,6 @@ bool setColor(String command)
     return true;
 }
 
-
-
 bool fadeColor(String command)
 {
     // Getting index of all the commas in the command
@@ -119,6 +117,7 @@ bool fadeColor(String command)
     int thirdCommaIndex = command.indexOf(',', secondCommaIndex+1);
     int fourthCommaIndex = command.indexOf(',', thirdCommaIndex+1);
     int fifthCommaIndex = command.indexOf(',', fourthCommaIndex+1);
+    int sixthCommaIndex = command.indexOf(',', fifthCommaIndex+1);
     
     // Using that indexes to split the command subunits
     String intensityRedStart = command.substring(0, firstCommaIndex);
@@ -126,7 +125,8 @@ bool fadeColor(String command)
     String intensityBlueStart = command.substring(secondCommaIndex+1, thirdCommaIndex);
     String intensityRedEnd = command.substring(thirdCommaIndex+1, fourthCommaIndex);
     String intensityGreenEnd = command.substring(fourthCommaIndex+1, fifthCommaIndex);
-    String intensityBlueEnd = command.substring(fifthCommaIndex+1);
+    String intensityBlueEnd = command.substring(fifthCommaIndex+1, sixthCommaIndex);
+    String transitionMilliseconds = command.substring(sixthCommaIndex+1);
 
     // Printing to serial the start color
     Serial.print("intensityRedStart: " + intensityRedStart);  
@@ -143,6 +143,9 @@ bool fadeColor(String command)
     Serial.println();
     Serial.print("intensityBlueEnd: " + intensityBlueEnd);  
     Serial.println();
+    Serial.print("transitionMilliseconds: " + transitionMilliseconds);  
+    Serial.println();
+    
     
     // Start color variable
     Color start(intensityRedStart.toInt(), intensityGreenStart.toInt(), intensityBlueStart.toInt());
@@ -151,11 +154,10 @@ bool fadeColor(String command)
     Color end(intensityRedEnd.toInt(), intensityGreenEnd.toInt(), intensityBlueEnd.toInt());
     
     // Fade one from Start color to End color
-    led.fadeOnce(start, end, 30000);
+    led.fadeOnce(start, end, transitionMilliseconds.toInt());
     
     return true;
 }
-
 
 void setup() {
     // Starting serial port
@@ -166,7 +168,6 @@ void setup() {
     // When the lamp is turned on the LED is off
     led.off();
 }
-
 
 void loop() {
     
