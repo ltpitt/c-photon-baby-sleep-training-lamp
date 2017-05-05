@@ -8,19 +8,10 @@ This script allows to use an RGB LED put in a lamp for baby sleep training
 
 ### How do I get set up? ###
 
-Pre-requisites
---------------
-
-- Android SDK v24
-- Android Build Tools v23.0.3
-- Android Support Repository v24.1.1
-
-Getting Started
----------------
-
-This sample uses the Gradle build system. To build this project, use the
-"gradlew build" command or use "Import Project" in Android Studio.
-
+* Copy the code contained into c-photon-baby-sleep-training-lamp.ino into Particle Build: https://build.particle.io/build/new
+* Add the required libraries to your project searching them in "Libraries", in your Particle Build project
+* Flash it to your Particle Photon
+* Cackle into a dark cave
 
 ### Contribution guidelines ###
 
