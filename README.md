@@ -7,7 +7,7 @@ Pre-requisites
 --------------
 
 - Particle Photon
-- RGB Led
+- RGB Led (https://nl.aliexpress.com/item/2PCS-10MM-RGB-LED-Module-Light-Emitting-Diode-for-Arduino-STM32-5V-M92/32658352638.html?spm=2114.48010208.4.76.66qoeb) or Neopixel Jewel (https://www.adafruit.com/product/2226)
 
 Getting Started
 ---------------
