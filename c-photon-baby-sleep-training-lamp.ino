@@ -402,7 +402,7 @@ int dfMini(String command) {
     Serial.println();
     // Execute the right function according to the one requested in the http call    
     if (function == "play") {
-        if (play()) {
+        if (playAll()) {
             return 1;
         } else {
             return -1;
