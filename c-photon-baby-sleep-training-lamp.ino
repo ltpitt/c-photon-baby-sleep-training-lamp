@@ -6,12 +6,14 @@
 * 
 * This is the Particle Photon code that controls its hardware
 * 
-* Davide Nastri, 2017
+* Davide Nastri, 8/20/2017
 */
 
-// RGB LED include
-#include <rgb-controls.h> // Include rgb led control library
-using namespace RGBControls;
+
+/* ======================= includes ================================= */
+// Neopixel RGB LED include
+#include "Particle.h"
+#include "neopixel.h"
 // Http call include
 #include "HttpClient/HttpClient.h" // Include HttpClient library
 // Df Mini Mp3 Player includes
@@ -45,21 +47,195 @@ String method; // Currently only "get" and "post" are implemented
 String hostname;
 int port;
 String path;
-// Declaring RGB led variables
-// Connect Red to D3
-// Connect Green to D1
-// Connect Blue to D0
-// Create a common anode led using false
-Led led(D0, D1, D2, false);
-Color red(255, 0, 0);
-Color green(0, 255, 0);
-Color blue(0, 0, 255);
-Color off(0, 0, 0);
 
 // Initializing all the previousIntensity variables to 0
 int previousIntensityRed = 0;
 int previousIntensityGreen = 0;
 int previousIntensityBlue = 0;
+
+/* ======================= prototypes =============================== */
+
+void colorAll(uint32_t c, uint8_t wait);
+void colorWipe(uint32_t c, uint8_t wait);
+void rainbow(uint8_t wait);
+void rainbowCycle(uint8_t wait);
+uint32_t Wheel(byte WheelPos);
+
+/* ======================= extra-examples.cpp ======================== */
+
+SYSTEM_MODE(AUTOMATIC);
+
+// IMPORTANT: Set pixel COUNT, PIN and TYPE
+#define PIXEL_COUNT 14
+#define PIXEL_PIN D0
+#define PIXEL_TYPE WS2812B
+
+// Parameter 1 = number of pixels in strip
+//               note: for some stripes like those with the TM1829, you
+//                     need to count the number of segments, i.e. the
+//                     number of controllers in your stripe, not the number
+//                     of individual LEDs!
+// Parameter 2 = pin number (most are valid)
+//               note: if not specified, D2 is selected for you.
+// Parameter 3 = pixel type [ WS2812, WS2812B, WS2812B2, WS2811,
+//                             TM1803, TM1829, SK6812RGBW ]
+//               note: if not specified, WS2812B is selected for you.
+//               note: RGB order is automatically applied to WS2811,
+//                     WS2812/WS2812B/WS2812B2/TM1803 is GRB order.
+//
+// 800 KHz bitstream 800 KHz bitstream (most NeoPixel products
+//               WS2812 (6-pin part)/WS2812B (4-pin part)/SK6812RGBW (RGB+W) )
+//
+// 400 KHz bitstream (classic 'v1' (not v2) FLORA pixels, WS2811 drivers)
+//                   (Radio Shack Tri-Color LED Strip - TM1803 driver
+//                    NOTE: RS Tri-Color LED's are grouped in sets of 3)
+
+Adafruit_NeoPixel strip(PIXEL_COUNT, PIXEL_PIN, PIXEL_TYPE);
+
+// IMPORTANT: To reduce NeoPixel burnout risk, add 1000 uF capacitor across
+// pixel power leads, add 300 - 500 Ohm resistor on first pixel's data input
+// and minimize distance between Arduino and first pixel.  Avoid connecting
+// on a live circuit...if you must, connect GND first.
+
+
+void fadeIn(uint8_t red, uint8_t green, uint8_t blue, uint8_t wait) {
+
+  for(uint8_t b=0; b <255; b++) {
+     for(uint8_t i=0; i < strip.numPixels(); i++) {
+        strip.setPixelColor(i, red*b/255, green*b/255, blue*b/255);
+     }
+     strip.show();
+     delay(wait);
+  };
+
+};
+
+void fadeOut(uint8_t red, uint8_t green, uint8_t blue, uint8_t wait) {
+
+  for(uint8_t b=255; b > 0; b--) {
+     for(uint8_t i=0; i < strip.numPixels(); i++) {
+        strip.setPixelColor(i, red*b/255, green*b/255, blue*b/255);
+     }
+     strip.show();
+     delay(wait);
+  };
+
+};
+
+void fadeInAndOut(uint8_t red, uint8_t green, uint8_t blue, uint8_t wait) {
+
+  for(uint8_t b=0; b <255; b++) {
+     for(uint8_t i=0; i < strip.numPixels(); i++) {
+        strip.setPixelColor(i, red*b/255, green*b/255, blue*b/255);
+     }
+     strip.show();
+     delay(wait);
+  };
+
+  for(uint8_t b=255; b > 0; b--) {
+     for(uint8_t i=0; i < strip.numPixels(); i++) {
+        strip.setPixelColor(i, red*b/255, green*b/255, blue*b/255);
+     }
+     strip.show();
+     delay(wait);
+  };
+};
+
+void colorFade(uint8_t r, uint8_t g, uint8_t b, uint8_t wait) {
+  for(uint16_t i = 0; i < strip.numPixels(); i++) {
+      uint8_t startR, startG, startB;
+      uint32_t startColor = strip.getPixelColor(i); // get the current colour
+      startB = startColor & 0xFF;
+      startG = (startColor >> 8) & 0xFF;
+      startR = (startColor >> 16) & 0xFF;  // separate into RGB components
+
+      if ((startR != r) || (startG != g) || (startB != b)){  // while the curr color is not yet the target color
+        if (startR < r) startR++; else if (startR > r) startR--;  // increment or decrement the old color values
+        if (startG < g) startG++; else if (startG > g) startG--;
+        if (startB < b) startB++; else if (startB > b) startB--;
+        strip.setPixelColor(i, startR, startG, startB);  // set the color
+        strip.show();
+        delay(1);  // add a delay if its too fast
+      }
+      delay(1000);
+  }
+}
+
+
+void candle() {
+   uint8_t green; // brightness of the green 
+   uint8_t red;  // add a bit for red
+   for(uint8_t i=0; i<100; i++) {
+     green = 50 + random(155);
+     red = green + random(50);
+     strip.setPixelColor(random(strip.numPixels()), red, green, 0);
+     strip.show();
+     delay(5);
+  }
+}
+
+
+int waitTime = 10;
+
+// Set all pixels in the strip to a solid color, then wait (ms)
+void colorAll(uint32_t c, uint8_t wait) {
+  uint16_t i;
+
+  for(i=0; i<strip.numPixels(); i++) {
+    strip.setPixelColor(i, c);
+  }
+  strip.show();
+  delay(wait);
+}
+
+// Fill the dots one after the other with a color, wait (ms) after each one
+void colorWipe(uint32_t c, uint8_t wait) {
+  for(uint16_t i=0; i<strip.numPixels(); i++) {
+    strip.setPixelColor(i, c);
+    strip.show();
+    delay(wait);
+  }
+}
+
+void rainbow(uint8_t wait) {
+  uint16_t i, j;
+
+  for(j=0; j<256; j++) {
+    for(i=0; i<strip.numPixels(); i++) {
+      strip.setPixelColor(i, Wheel((i+j) & 255));
+    }
+    strip.show();
+    delay(wait);
+  }
+}
+
+// Slightly different, this makes the rainbow equally distributed throughout, then wait (ms)
+void rainbowCycle(uint8_t wait) {
+  uint16_t i, j;
+
+  for(j=0; j<256; j++) { // 1 cycle of all colors on wheel
+    for(i=0; i< strip.numPixels(); i++) {
+      strip.setPixelColor(i, Wheel(((i * 256 / strip.numPixels()) + j) & 255));
+    }
+    strip.show();
+    delay(wait);
+  }
+}
+
+// Input a value 0 to 255 to get a color value.
+// The colours are a transition r - g - b - back to r.
+uint32_t Wheel(byte WheelPos) {
+  if(WheelPos < 85) {
+   return strip.Color(WheelPos * 3, 255 - WheelPos * 3, 0);
+  } else if(WheelPos < 170) {
+   WheelPos -= 85;
+   return strip.Color(255 - WheelPos * 3, 0, WheelPos * 3);
+  } else {
+   WheelPos -= 170;
+   return strip.Color(0, WheelPos * 3, 255 - WheelPos * 3);
+  }
+}
+
 
 // sendHttpRequest function
 void sendHttpRequest(String method, String hostname, int port, String path, String body) {
@@ -110,15 +286,8 @@ int setColor(String command) {
     Serial.println();
     Serial.print("transitionMilliseconds: " + transitionMilliseconds);  
     Serial.println();
-    // Start color variable
-    Color start(previousIntensityRed, previousIntensityGreen, previousIntensityBlue);
-    // End color variable
-    Color end(intensityRed.toInt(), intensityGreen.toInt(), intensityBlue.toInt());
-    // Fade one from Start color to End color
-    led.fadeOnce(start, end, transitionMilliseconds.toInt());
-    previousIntensityRed = intensityRed.toInt();
-    previousIntensityGreen = intensityGreen.toInt();
-    previousIntensityBlue = intensityBlue.toInt();
+    // Fading to new color
+    fadeIn(intensityRed.toInt(), intensityGreen.toInt(), intensityBlue.toInt(), 10);
     return 1;
 }
 
@@ -143,7 +312,7 @@ bool togglePlay() {
     if (isPlaying) {
         pause();
     } else {
-        play();
+        playAll();
     }
     return true;
 }
@@ -165,6 +334,13 @@ bool pause() {
 
 bool play() {
     execute_CMD(0x0D, 0, 1);
+    isPlaying = true;
+    delay(500);
+    return true;
+}
+
+bool playAll() {
+    execute_CMD(0x11, 0, 1);
     isPlaying = true;
     delay(500);
     return true;
@@ -259,6 +435,9 @@ int dfMini(String command) {
 }
 
 void setup() {
+    // Starting Neopixel LEDs
+    strip.begin();
+    strip.show(); // Initialize all pixels to 'off'
     // Starting serial port used for debugging
     Serial.begin(9600);
     // Starting serial port used to control Df Mini Mp3 Player
@@ -266,12 +445,10 @@ void setup() {
     // Publish functions on the Particle Cloud
     Particle.function("setColor", setColor);
     Particle.function("dfMini", dfMini);
-    // When the Little Cloud is turned on the LED is off
-    led.off();
     // Music is not playing
     isPlaying = false;
     // And volume is set to Max
-    setVolume(30);  
+    setVolume(20);  
     // Mp3 Player buttons need to be set
     pinMode(buttonPause, INPUT_PULLUP);
     digitalWrite(buttonPause, HIGH);
@@ -283,6 +460,15 @@ void setup() {
 
 void loop() {
     buttonInputChecker();
+    // Test LEDs
+    //fadeIn(255, 0, 0, 10);
+    //fadeIn(0, 255, 0, 10);
+    //fadeIn(0, 0, 255, 10);
+    //fadeOut(0, 0, 255, 5);
+    //colorFade(255,0,0,1);
+    //colorFade(0,255,0,1000);
+    //colorFade(0,0,255,1);
+    //candle();
     // Example http calls
     //sendHttpRequest("post", "davidenastri.it", 8080, "/", "Ciao");
     //sendHttpRequest("get", "davidenastri.it", 8080, "/", "Ciao");
