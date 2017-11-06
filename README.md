@@ -3,6 +3,13 @@ Little Cloud - Baby Sleep Training Lamp
 
 Particle Photon code that allows to control RGB LED put in a lamp for baby sleep training
 
+App images
+--------------
+<img src="/pics/little_cloud_off.jpg" width="25%">
+<img src="/pics/little_cloud_red.jpg" width="25%">
+<img src="/pics/little_cloud_green.jpg" width="25%">
+<img src="/pics/little_cloud_blue.jpg" width="25%">
+
 Pre-requisites
 --------------
 
