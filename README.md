@@ -1,3 +1,9 @@
+[![GitHub Issues](https://img.shields.io/github/issues-raw/ltpitt/c-photon-baby-sleep-training-lamp)](https://github.com/ltpitt/c-photon-baby-sleep-training-lamp/issues)
+[![Total Commits](https://img.shields.io/github/last-commit/ltpitt/c-photon-baby-sleep-training-lamp)](https://github.com/ltpitt/c-photon-baby-sleep-training-lamp/commits)
+[![GitHub commit activity](https://img.shields.io/github/commit-activity/4w/ltpitt/c-photon-baby-sleep-training-lamp?foo=bar)](https://github.com/ltpitt/c-photon-baby-sleep-training-lamp/commits)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/ltpitt/c-photon-baby-sleep-training-lamp/blob/master/LICENSE)
+![Contributions welcome](https://img.shields.io/badge/contributions-welcome-orange.svg)
+
 Little Cloud - Baby Sleep Training Lamp
 ===================================
 
