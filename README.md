@@ -7,7 +7,7 @@
 Little Cloud - Baby Sleep Training Lamp
 ===================================
 
-Particle Photon code that allows to control RGB LED put in a lamp for baby sleep training
+The code contained in this repo can be used to program a [Particle Photon](https://store.particle.io/products/photon) and control the REB leds connected to it.  I used this cloud controlled RGB led solution to create a Baby Sleep Training Lamp.
 
 Lamp images
 --------------
