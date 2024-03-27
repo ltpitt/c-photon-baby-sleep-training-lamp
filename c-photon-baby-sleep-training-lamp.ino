@@ -376,40 +376,33 @@ int dfMini(String command) {
             isPlaying = true;
             Particle.publish("isPlaying", String(isPlaying), PRIVATE);        
             return 1;
-        } else {
-            return -1;
         }
     } else if (function == "pause") {
         if (setPause()) {
             isPlaying = false;
             Particle.publish("isPlaying", String(isPlaying), PRIVATE);        
             return 1;
-        } else {
-            return -1;
         }
     } else if (function == "playPrevious") {
         if (playPrevious()) {
             isPlaying = true;
             Particle.publish("isPlaying", String(isPlaying), PRIVATE);        
             return 1;
-        } else {
-            return -1;
         }
     } else if (function == "playNext") {
         if (playNext()) {
             isPlaying = true;
             Particle.publish("isPlaying", String(isPlaying), PRIVATE);        
             return 1;
-        } else {
-            return -1;
         }
     } else if (function == "setVolume") {
         if (setVolume(parameter.toInt())) {
             return 1;
-        } else {
-            return -1;
         }
     }
+    
+    return -1;
+    
 }
 
 int setColor(String command) {
@@ -469,38 +462,8 @@ void setup() {
     digitalWrite(buttonNext, HIGH);
     pinMode(buttonPrevious, INPUT_PULLUP);
     digitalWrite(buttonPrevious, HIGH);
-    // if (Particle.connected()) {
-    //     colorFade(0, 25, 0, 1000);
-    //     colorFade(0, 0, 0, 1000);
-    //     Particle.publish("Baby Sleep Training Lamp is now Cloud Connected", PUBLIC);
-    //     Particle.variable("isLightOn", "true");
-    // } else {
-    //     colorFade(25, 0, 0, 1000);
-    //     colorFade(0, 0, 0, 1000);
-    //     colorFade(25, 0, 0, 1000);
-    //     colorFade(0, 0, 0, 1000);
-    //     colorFade(25, 0, 0, 1000);
-    //     colorFade(0, 0, 0, 1000);
-    //     Particle.variable("isLightOn", "false");
-    // }
-    
 }
 
 void loop() {
-    // Particle.publishVitals();
     buttonInputChecker();
-    //Particle.publish("Baby Sleep Training Lamp is now Cloud Connected", PUBLIC);
-    //Particle.variable("isLightOn", "true");
-    // Test LEDs
-    //fadeIn(255, 0, 0, 10);
-    //fadeIn(0, 255, 0, 10);
-    //fadeIn(0, 0, 255, 10);
-    //fadeOut(0, 0, 255, 5);
-    //colorFade(255,0,0,1);
-    //colorFade(0,255,0,1000);
-    //colorFade(0,0,255,1);
-    //candle();
-    // Example http calls
-    //sendHttpRequest("post", "davidenastri.it", 8080, "/", "Ciao");
-    //sendHttpRequest("get", "davidenastri.it", 8080, "/", "Ciao");
 }
